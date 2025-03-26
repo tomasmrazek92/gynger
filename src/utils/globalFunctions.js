@@ -55,8 +55,8 @@ const getMergedSwiperOptions = (options, uniqueKey) => {
   return Object.assign({}, options, {
     speed: 1000,
     navigation: {
-      prevEl: `.swiper-arrow.prev.${uniqueKey}`,
-      nextEl: `.swiper-arrow.next.${uniqueKey}`,
+      prevEl: `.swiper-arrow.is-prev.${uniqueKey}`,
+      nextEl: `.swiper-arrow.is-next.${uniqueKey}`,
     },
     pagination: {
       el: `.swiper-pag.${uniqueKey}`,
