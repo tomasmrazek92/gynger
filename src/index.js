@@ -108,6 +108,90 @@ function initCSSMarquee() {
     observer.observe(marquee);
   });
 }
+function initFormValid() {
+  // Target all forms with custom validation attribute
+  $('form[data-validate="email"]').each(function () {
+    const $form = $(this);
+    const $emailInput = $form.find('input[type="email"]');
+    const $formBlock = $form.closest('.w-form');
+    let hasBlurred = false; // Track if the field has been blurred at least once
+
+    // Skip if no email input exists
+    if ($emailInput.length === 0) return;
+
+    // Function to validate email format
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // Function to set error state
+    function setErrorState(isError) {
+      if (isError) {
+        $emailInput.addClass('error');
+        $formBlock.addClass('is-error');
+      } else {
+        $emailInput.removeClass('error');
+        $formBlock.removeClass('is-error');
+      }
+    }
+
+    // Add focus class when input is focused
+    $emailInput.on('focus', function () {
+      $form.addClass('is-focus');
+    });
+
+    // Remove focus class when input is blurred and validate
+    $emailInput.on('blur', function () {
+      $form.removeClass('is-focus');
+
+      // Mark as blurred so we can start validating on input
+      hasBlurred = true;
+
+      // Validate on first blur
+      const emailValue = $(this).val().trim();
+
+      // Skip validation if field is empty
+      if (emailValue === '') {
+        setErrorState(false);
+        return;
+      }
+
+      // Set error state based on validation result
+      setErrorState(!isValidEmail(emailValue));
+    });
+
+    // Validate email as user types, but only after first blur
+    $emailInput.on('input', function () {
+      // Only validate on input if the field has been blurred at least once
+      if (!hasBlurred) return;
+
+      const emailValue = $(this).val().trim();
+
+      // Skip validation if field is empty
+      if (emailValue === '') {
+        setErrorState(false);
+        return;
+      }
+
+      // Set error state based on validation result
+      setErrorState(!isValidEmail(emailValue));
+    });
+
+    // Handle form submission
+    $form.on('submit', function (e) {
+      const emailValue = $emailInput.val().trim();
+
+      // Always validate on submit regardless of blur state
+      if (!isValidEmail(emailValue)) {
+        e.preventDefault();
+        setErrorState(true);
+        hasBlurred = true; // Enable ongoing validation after submit attempt
+        return false;
+      }
+    });
+  });
+}
 
 function animateHPproducts() {
   const hp1 = () => {
@@ -270,6 +354,7 @@ let swiperInstances = [
 $(document).ready(function () {
   globalAnims();
   initCSSMarquee();
+  initFormValid();
   initSwipers(swiperInstances);
   animateHPproducts();
 });
