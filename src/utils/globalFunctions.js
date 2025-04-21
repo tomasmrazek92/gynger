@@ -27,7 +27,7 @@ export const createResponsiveSwiper = (
     // Step 4: Add unique classes to swiper container, arrows and pagination for this instance
     addUniqueClassesToElements(this, swiperSelector, uniqueKey, [
       '.swiper-arrow',
-      '.swiper-pag',
+      '.swiper-nav',
       '.swiper-drag-wrapper',
     ]);
 
@@ -59,10 +59,10 @@ const getMergedSwiperOptions = (options, uniqueKey) => {
       nextEl: `.swiper-arrow.is-next.${uniqueKey}`,
     },
     pagination: {
-      el: `.swiper-pag.${uniqueKey}`,
+      el: `.swiper-nav.${uniqueKey}`,
       type: 'bullets',
-      bulletActiveClass: 'cc-active',
-      bulletClass: 'swiper-pag-item',
+      bulletActiveClass: 'is-active',
+      bulletClass: 'swiper-dot',
       clickable: true,
     },
   });

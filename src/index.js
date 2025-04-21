@@ -192,7 +192,54 @@ function initFormValid() {
     });
   });
 }
+function mirrorFilterReset() {
+  // Empty State Clear Button
+  $('[data-empty-clear]').on('click', function () {
+    let resetButton = $(this).closest('section').find("[fs-cmsfilter-element='clear']");
+    resetButton.trigger('click');
+  });
+}
+function initFS() {
+  //Filter Reset Button
+  window.fsAttributes = window.fsAttributes || [];
+  // Filter
+  window.fsAttributes.push([
+    'cmsfilter',
+    (filterInstances) => {
+      // Ensure filterInstances is defined and not empty
+      if (filterInstances && filterInstances.length > 0) {
+        const [filterInstance] = filterInstances;
 
+        // Check if filterInstance exists and resetButtonsData has keys
+        if (filterInstance) {
+          // Check if filtersData exists and has the necessary data
+          if (filterInstance.filtersData && filterInstance.filtersData[0]) {
+            function updateDropdownLabel(entries) {
+              let label = $('[data-category-label]');
+              if (entries.length >= 1) {
+                label.text(entries[0]);
+              } else {
+                let defaultText = label
+                  .closest('.w-dropdown')
+                  .find('.w-dropdown-list a:first-child')
+                  .text();
+                label.text(defaultText);
+              }
+            }
+
+            filterInstance.listInstance.on('renderitems', function () {
+              let entries = [...filterInstance.filtersData[1].values];
+              console.log(entries);
+              updateDropdownLabel(entries);
+            });
+          }
+        }
+      }
+    },
+  ]);
+
+  mirrorFilterReset();
+}
 function animateHPproducts() {
   const hp1 = () => {
     // els
@@ -349,12 +396,23 @@ let swiperInstances = [
     },
     'all',
   ],
+  [
+    '.section_hero-carousel',
+    '.hero-carousel_slider',
+    'hero-slider',
+    {
+      slidesPerView: 'auto',
+      spaceBetween: 32,
+    },
+    'all',
+  ],
 ];
 
 $(document).ready(function () {
   globalAnims();
   initCSSMarquee();
   initFormValid();
+  initFS();
   initSwipers(swiperInstances);
   animateHPproducts();
 });
