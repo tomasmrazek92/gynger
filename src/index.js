@@ -385,6 +385,180 @@ function animateHPproducts() {
   hp1();
   hp2();
 }
+function initCopyUrl() {
+  $(document).ready(function () {
+    $('[data-copy]').on('click', function () {
+      let type = $(this).attr('data-copy');
+
+      if (type === 'url') {
+        copyClipboard($(this), $(location).attr('href'));
+      } else {
+        copyClipboard($(this), type);
+      }
+    });
+
+    function copyClipboard(el, val) {
+      // Paste here
+      var $temp = $('<input>');
+      var ogIcon = $(el).find('.w-embed:first-child');
+      var label = $(el).find('.w-embed:last-child');
+      let timeOut;
+
+      // Click
+      $('body').append($temp);
+      $temp.val(val).select();
+      document.execCommand('copy');
+      $temp.remove();
+
+      clearTimeout(timeOut); // Corrected the function name and variable consistency
+      label.hide();
+      ogIcon.hide();
+      label.css('display', 'flex');
+      timeOut = setTimeout(() => {
+        label.hide();
+        ogIcon.css('display', 'flex');
+      }, 2000);
+    }
+  });
+}
+function initCustomTabs() {
+  // Base
+  const tabItems = document.querySelectorAll('.partner-tabs_item');
+  const lastWidth = window.innerWidth;
+  const activeClass = 'is-active';
+
+  // Els
+  const tabBodies = '.partner-tabs_body';
+  const tabImages = '.partner-tabs_image';
+  const tabSubtitles = '[data-subtitle]';
+  const tabVlines = '.dd_toggle-line-v';
+
+  tabItems.forEach((item) => {
+    item.addEventListener('click', function () {
+      animateTabs(item);
+    });
+  });
+
+  // Init
+  resetTabs();
+  activateFirstTab();
+
+  window.addEventListener('resize', () => {
+    if (lastWidth !== window.innerWidth) {
+      // Fix for mobile to desktop transition
+      if (window.innerWidth > 991) {
+        // Find all active tabs and keep only the first one
+        const activeTabs = Array.from(tabItems).filter((tab) =>
+          tab.classList.contains(activeClass)
+        );
+        if (activeTabs.length > 1) {
+          // Keep first active tab, reset others
+          for (let i = 1; i < activeTabs.length; i++) {
+            activeTabs[i].classList.remove(activeClass);
+          }
+        }
+      }
+      resetTabs();
+    }
+  });
+
+  function resetTabs() {
+    tabItems.forEach((item) => {
+      if (item.classList.contains(activeClass)) return;
+      // Els
+      const tabBody = item.querySelector(tabBodies);
+      const tabImage = item.querySelector(tabImages);
+      const tabSubtitle = item.querySelector(tabSubtitles);
+      const tabVline = item.querySelector(tabVlines);
+
+      if (window.innerWidth <= 991) {
+        gsap.to(tabBody, { duration: 0, display: 'none', height: 0 });
+        gsap.to(tabImage, { opacity: 1, duration: 0 });
+        gsap.to(tabSubtitle, { opacity: 1, y: 0, duration: 0 });
+        gsap.to(tabVline, { duration: 0, rotateZ: '-90deg' });
+      } else {
+        gsap.to(tabBody, { duration: 0, height: 0, display: 'none' });
+        gsap.to(tabImage, { opacity: 0, duration: 0 });
+        gsap.to(tabSubtitle, { opacity: 0, y: 15, duration: 0 });
+        gsap.to(tabVline, { duration: 0, rotateZ: '-90deg' });
+      }
+      // Remove the 'is-active' class
+      item.classList.remove(activeClass);
+    });
+    // Activate the first tab on page load
+    activateFirstTab();
+  }
+
+  function activateFirstTab() {
+    const firstTab = tabItems[0];
+
+    // Fix for first-time page load to ensure vline is rotated properly
+    if (firstTab) {
+      if (!firstTab.classList.contains(activeClass)) {
+        animateTabs(firstTab);
+      } else {
+        // If it's already active, just make sure the vline is correctly positioned
+        const isMobile = window.innerWidth <= 991;
+        if (isMobile) {
+          // For mobile, force reset the vline to correct position
+          gsap.set(firstTab.querySelector(tabVlines), { rotateZ: '0deg' });
+          gsap.set(firstTab.querySelector(tabBodies), { display: 'flex', height: 'auto' });
+        }
+      }
+    }
+  }
+
+  function animateTabs(activeItem) {
+    const isMobile = window.innerWidth <= 991;
+    const isClosing = activeItem.classList.contains(activeClass);
+    const tl = gsap.timeline({ ease: 'power1.inOut' });
+
+    // For desktop only: close any currently open tab that's not the clicked one
+    if (!isMobile) {
+      const currentActiveTab = Array.from(tabItems).find(
+        (tab) => tab.classList.contains(activeClass) && tab !== activeItem
+      );
+
+      if (currentActiveTab) {
+        currentActiveTab.classList.remove(activeClass);
+
+        tl.to(currentActiveTab.querySelector(tabBodies), { duration: 0.3, height: 0 })
+          .to(currentActiveTab.querySelector(tabSubtitles), { opacity: 0, y: 15, duration: 0.3 }, 0)
+          .to(currentActiveTab.querySelector(tabImages), { opacity: 0, duration: 0.3 }, 0)
+          .set(currentActiveTab.querySelector(tabBodies), { display: 'none' });
+      }
+    }
+
+    // Mobile toggle behavior
+    if (isMobile) {
+      if (isClosing) {
+        // Close clicked tab on mobile
+        tl.to(activeItem.querySelector(tabBodies), { duration: 0.5, height: 0 })
+          .to(activeItem.querySelector(tabVlines), { duration: 0.5, rotateZ: '-90deg' }, 0)
+          .set(activeItem.querySelector(tabBodies), { display: 'none' });
+        activeItem.classList.remove(activeClass);
+      } else {
+        // Open clicked tab on mobile
+        tl.set(activeItem.querySelector(tabBodies), { display: 'flex', height: 0 })
+          .set(activeItem.querySelector(tabImages), { opacity: 1 })
+          .set(activeItem.querySelector(tabSubtitles), { opacity: 1, y: 0 })
+          .to(activeItem.querySelector(tabBodies), { duration: 0.7, height: 'auto' })
+          .to(activeItem.querySelector(tabVlines), { duration: 0.5, rotateZ: '0deg' }, 0);
+        activeItem.classList.add(activeClass);
+      }
+    }
+    // Desktop open behavior
+    else if (!isClosing) {
+      tl.set(activeItem.querySelector(tabBodies), { display: 'block', height: 0 })
+        .to(activeItem.querySelector(tabBodies), { duration: 0.5, height: 'auto' })
+        .to(activeItem.querySelector(tabSubtitles), { opacity: 1, y: 0, duration: 0.5 })
+        .to(activeItem.querySelector(tabImages), { opacity: 1, duration: 0.5 }, '<');
+      activeItem.classList.add(activeClass);
+    }
+
+    return tl;
+  }
+}
 
 let swiperInstances = [
   [
@@ -415,4 +589,6 @@ $(document).ready(function () {
   initFS();
   initSwipers(swiperInstances);
   animateHPproducts();
+  initCopyUrl();
+  initCustomTabs();
 });
