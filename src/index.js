@@ -8,11 +8,9 @@ function globalAnims() {
     let progressBar = $(this).find('[data-counter-progress]');
     let scoreText = counterElement.text();
 
-    // Continue with normal animation for numeric scores
     let score = parseFloat(scoreText);
     let counter = { val: 0 };
 
-    // Set initial width to 0
     progressBar.css('width', '0%');
     counterElement.css('opacity', '0');
 
@@ -23,7 +21,6 @@ function globalAnims() {
       },
     });
 
-    // Animate both width and counter
     tl.to(counter, {
       val: score,
       duration: 1,
@@ -31,7 +28,8 @@ function globalAnims() {
         gsap.set(counterElement, { opacity: 1 });
       },
       onUpdate: function () {
-        counterElement.text(counter.val.toFixed(3));
+        let formatted = counter.val.toFixed(3).replace('.', ',');
+        counterElement.text(formatted);
       },
       ease: 'power2.out',
     });
@@ -108,24 +106,25 @@ function initCSSMarquee() {
     observer.observe(marquee);
   });
 }
-function initFormValid() {
-  // Target all forms with custom validation attribute
-  $('form[data-validate="email"]').each(function () {
+window.initFormValid = function (form) {
+  $(form).each(function () {
     const $form = $(this);
     const $emailInput = $form.find('input[type="email"]');
-    const $formBlock = $form.closest('.w-form');
-    let hasBlurred = false; // Track if the field has been blurred at least once
+    let $formBlock = $form.closest('.w-form');
 
-    // Skip if no email input exists
+    if ($formBlock.length === 0) {
+      $formBlock = $form.closest('form');
+    }
+
+    let hasBlurred = false;
+
     if ($emailInput.length === 0) return;
 
-    // Function to validate email format
     function isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     }
 
-    // Function to set error state
     function setErrorState(isError) {
       if (isError) {
         $emailInput.addClass('error');
@@ -136,62 +135,47 @@ function initFormValid() {
       }
     }
 
-    // Add focus class when input is focused
     $emailInput.on('focus', function () {
       $form.addClass('is-focus');
     });
 
-    // Remove focus class when input is blurred and validate
     $emailInput.on('blur', function () {
       $form.removeClass('is-focus');
-
-      // Mark as blurred so we can start validating on input
       hasBlurred = true;
 
-      // Validate on first blur
       const emailValue = $(this).val().trim();
-
-      // Skip validation if field is empty
       if (emailValue === '') {
         setErrorState(false);
         return;
       }
 
-      // Set error state based on validation result
       setErrorState(!isValidEmail(emailValue));
     });
 
-    // Validate email as user types, but only after first blur
     $emailInput.on('input', function () {
-      // Only validate on input if the field has been blurred at least once
       if (!hasBlurred) return;
 
       const emailValue = $(this).val().trim();
-
-      // Skip validation if field is empty
       if (emailValue === '') {
         setErrorState(false);
         return;
       }
 
-      // Set error state based on validation result
       setErrorState(!isValidEmail(emailValue));
     });
 
-    // Handle form submission
     $form.on('submit', function (e) {
       const emailValue = $emailInput.val().trim();
 
-      // Always validate on submit regardless of blur state
       if (!isValidEmail(emailValue)) {
         e.preventDefault();
         setErrorState(true);
-        hasBlurred = true; // Enable ongoing validation after submit attempt
+        hasBlurred = true;
         return false;
       }
     });
   });
-}
+};
 function mirrorFilterReset() {
   // Empty State Clear Button
   $('[data-empty-clear]').on('click', function () {
@@ -214,8 +198,8 @@ function initFS() {
         if (filterInstance) {
           // Check if filtersData exists and has the necessary data
           if (filterInstance.filtersData && filterInstance.filtersData[0]) {
-            function updateDropdownLabel(entries) {
-              let label = $('[data-category-label]');
+            function updateDropdownLabel(entries, labelSelector) {
+              let label = $(labelSelector);
               if (entries.length >= 1) {
                 label.text(entries[0]);
               } else {
@@ -228,9 +212,17 @@ function initFS() {
             }
 
             filterInstance.listInstance.on('renderitems', function () {
-              let entries = [...filterInstance.filtersData[1].values];
-              console.log(entries);
-              updateDropdownLabel(entries);
+              // Update first label with filtersData[1]
+              if (filterInstance.filtersData[1]) {
+                let entries1 = [...filterInstance.filtersData[1].values];
+                updateDropdownLabel(entries1, '[data-category-label="1"]');
+              }
+
+              // Update second label with filtersData[2]
+              if (filterInstance.filtersData[2]) {
+                let entries2 = [...filterInstance.filtersData[2].values];
+                updateDropdownLabel(entries2, '[data-category-label="2"]');
+              }
             });
           }
         }
@@ -585,7 +577,7 @@ let swiperInstances = [
 $(document).ready(function () {
   globalAnims();
   initCSSMarquee();
-  initFormValid();
+  window.initFormValid('form[data-validate="email"]');
   initFS();
   initSwipers(swiperInstances);
   animateHPproducts();
