@@ -69,7 +69,7 @@ function globalAnims() {
   });
 }
 function initCSSMarquee() {
-  const pixelsPerSecond = 75; // Set the marquee speed (pixels per second)
+  const pixelsPerSecond = 25; // Set the marquee speed (pixels per second)
   const marquees = document.querySelectorAll('[data-css-marquee]');
 
   // Duplicate each [data-css-marquee-list] element inside its container
