@@ -551,6 +551,11 @@ function initCustomTabs() {
     return tl;
   }
 }
+function loadSplines() {
+  setTimeout(() => {
+    $('[data-spline-iframe]').css('opacity', '1');
+  }, 1500);
+}
 
 let swiperInstances = [
   [
@@ -583,4 +588,5 @@ $(document).ready(function () {
   animateHPproducts();
   initCopyUrl();
   initCustomTabs();
+  loadSplines();
 });
