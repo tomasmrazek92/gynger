@@ -10,7 +10,6 @@ if (window.location.pathname === '/careers') {
     })
     .then((data) => {
       let roles = data;
-      console.log(data);
 
       // Arrays to store unique values
       let uniqueWorkplaceTypes = [];
@@ -57,13 +56,6 @@ if (window.location.pathname === '/careers') {
           });
         }
       });
-
-      // Log the unique values and jobs by team
-      console.log('Unique Workplace Types:', uniqueWorkplaceTypes);
-      console.log('Unique Commitments:', uniqueCommitments);
-      console.log('Unique Teams:', uniqueTeams);
-      console.log('Unique Locations:', uniqueLocations);
-      console.log('Jobs By Team:', jobsByTeam);
 
       // Update the dropdowns with unique values
       updateDropdown('[data-dropdown-location-type]', uniqueWorkplaceTypes, 'All');
@@ -248,9 +240,7 @@ if (window.location.pathname === '/careers') {
           jobItem.find('[data-roles="item-commitment"]').text(job.categories.commitment || '');
 
           // Set link
-          jobItem
-            .find('[data-roles="item-link"]')
-            .attr('href', job.hostedUrl || `/careers/role?=${job.id}`);
+          jobItem.attr('href', job.hostedUrl);
 
           // Add data attributes for filtering
           jobItem.attr('data-workplace-type', job.workplaceType || '');
