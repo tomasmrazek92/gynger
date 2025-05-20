@@ -568,6 +568,19 @@ let swiperInstances = [
     'all',
   ],
   [
+    '.section_team',
+    '.team_list-wrap',
+    'team',
+    {
+      slidesPerView: 'auto',
+      loop: true,
+      autoplay: {
+        delay: 1500,
+      },
+    },
+    'all',
+  ],
+  [
     '.section_hero-carousel',
     '.hero-carousel_slider',
     'hero-slider',
