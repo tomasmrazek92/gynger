@@ -65,6 +65,13 @@ const getMergedSwiperOptions = (options, uniqueKey) => {
       bulletClass: 'swiper-dot',
       clickable: true,
     },
+    mousewheel: {
+      enabled: true,
+      forceToAxis: true,
+    },
+    keyboard: {
+      enabled: true,
+    },
   });
 };
 

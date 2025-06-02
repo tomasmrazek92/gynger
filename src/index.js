@@ -568,6 +568,19 @@ let swiperInstances = [
     'all',
   ],
   [
+    '.section_company-pics',
+    '.team-pics_list-wrap',
+    'team-pics',
+    {
+      slidesPerView: 'auto',
+      loop: true,
+      autoplay: {
+        delay: 1500,
+      },
+    },
+    'all',
+  ],
+  [
     '.section_team',
     '.team_list-wrap',
     'team',
